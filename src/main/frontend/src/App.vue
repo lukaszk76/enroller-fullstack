@@ -11,7 +11,19 @@
       <meetings-page :username="authenticatedUsername"></meetings-page>
     </div>
     <div v-else>
-      <login-form @login="login($event)"></login-form>
+      <button @click="registering = false"
+      :class="registering ? 'button-outline' : ''">Loguje sie</button>
+      
+      <button @click="registering = true"
+      :class="!registering ? 'button-outline' : ''">Rejestruje sie</button>
+        
+      <div v-if="error" class="error-alert">{{error}}</div>
+      
+      <login-form @login="login($event)"
+      v-if="registering == false"></login-form>
+      
+      <login-form @login="register($event)"
+      button-label="Zarejestruj sie" v-else ></login-form>
     </div>
   </div>
 </template>
@@ -25,7 +37,9 @@
         components: {LoginForm, MeetingsPage},
         data() {
             return {
-                authenticatedUsername: ""
+                authenticatedUsername: "",
+                registering: false,
+                error: ''
             };
         },
         methods: {
@@ -34,6 +48,18 @@
             },
             logout() {
                 this.authenticatedUsername = '';
+            },
+            register(user){
+              this.registering = false;
+              this.error = '';
+              this.$http.post('participants', user)
+              .then(response => {
+               // udało się
+              })
+              .catch(response => {
+                  // nie udało sie    
+                  this.error = 'Taki uzytkownik juz istnieje' 
+              });
             }
         }
     };
@@ -47,6 +73,13 @@
 
   .logo {
     vertical-align: middle;
+  }
+
+  .error-alert {
+    border: 2px dotted red;
+    background: lightgrey;
+    padding: 10px;
+    text-align: center;
   }
 </style>
 
