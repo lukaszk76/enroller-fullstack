@@ -31,14 +31,22 @@
         },
         methods: {
             addNewMeeting(meeting) {
-                this.meetings.push(meeting);
+                this.$http.post('meetings', meeting)
+                    .then(() => {
+                        this.success('Spotkanie zostało dodane. Możesz się zapisać.');
+                        this.meetings.push(meeting);
+                    })
+                    .catch(response => this.failure('Błąd przy dodawaniu spotkania. Kod odpowiedzi: ' + response.status));
             },
+
             addMeetingParticipant(meeting) {
                 meeting.participants.push(this.username);
             },
+
             removeMeetingParticipant(meeting) {
                 meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
             },
+            
             deleteMeeting(meeting) {
                 this.meetings.splice(this.meetings.indexOf(meeting), 1);
             }

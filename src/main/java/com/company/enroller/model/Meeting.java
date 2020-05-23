@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "meeting")
-public class Meeting {
+public class Meeting implements Comparable<Meeting> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -71,5 +71,16 @@ public class Meeting {
     public Collection<Participant> getParticipants() {
         return participants;
     }
+    
+    public void update(Meeting updated_meeting) {
+		this.setTitle(updated_meeting.getTitle());
+		this.setDescription(updated_meeting.getDescription());
+		this.setDate(updated_meeting.getDate());
+	}
 
+    @Override
+	public int compareTo(Meeting o) {
+		// TODO Auto-generated method stub
+		return this.getTitle().compareTo(o.getTitle());
+	}
 }
