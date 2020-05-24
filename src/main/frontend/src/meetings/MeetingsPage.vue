@@ -52,11 +52,11 @@
                       meeting.participants.push(this.username);
                       this.success('Pomyślnie zapisałeś sie na spotkanie.');
                     })
-                    .catch(response => this.failure('Błąd przy zapisie uczestnika do spotkania. Kod odpowiedzi: ' + response.status));
+                    .catch(response => this.failure('Błąd przy zapisywaniu uczestnika do spotkania' + response.status));
             },
 
             removeMeetingParticipant(meeting) {
-                var query = "meetings/" + meeting.id + "/" + this.username;
+                var query = "meetings/" + meeting.id + "/" + this.username; 
                 this.$http.delete(query)
                     .then( () => {
                       meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
@@ -79,32 +79,55 @@
                 this.message = message;
                 this.isError = false;
             },
+
             failure(message) {
                 this.message = message;
                 this.isError = true;
             },
+            
             clearMessage() {
                 this.message = undefined;
+            },
+
+            loadParticipants() {
+              this.meetings.forEach( (meeting) => {
+                var query = 'meetings/' + meeting.id + '/participants';
+                this.$http.get(query)
+                .then( response => 
+                {
+                  response.body.forEach( (participant =>
+                  {
+                    meeting.participants.push(participant.login);
+                  }))
+                })
+              })
+            },
+
+            loadMeetings() {
+              this.meetings = [];
+              this.$http.get('meetings')
+              .then( response => {
+                
+                for (var meeting of response.body){
+                  meeting.participants = [];
+                  this.meetings.push(meeting);
+                }
+
+                this.loadParticipants();
+
+              })
+              .catch( response => {
+                this.failure('Błąd podczas pobierania listy spotkań. Kod błedu: ' + response.status);
+              })
             }
         },
 
- //       created() {
-   //         this.$http.get("meetings")
-     //       .then(response => {
-       //         this.meetings = JSON.parse(response.body);
-                //for (meeting in this.meetings) {
-                //    var query = "meetings/" + meeting.id + "/participants";
-                //    this.$http.get(query)
-                //    .then(response => {
-                //        meeting["participants"] = JSON.parse(response.body);
-                //    })
-                //    .catch(() => this.failure('Nie udało sie pobrac listy uczestnikow dla spotkania ' + meeting.title ));
-                //}
-  //           })
-    //        .catch(() => this.failure('Nie udało sie pobrać listy spotkań.' + response.status));
-      //  },
+        mounted() {
+            this.loadMeetings();            
+        },
 
     }
+
 </script>
 <style lang="scss">
  .alert {
