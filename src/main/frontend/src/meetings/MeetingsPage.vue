@@ -1,5 +1,6 @@
 <template>
   <div>
+    <div :class="'alert alert-' + (this.isError ? 'error' : 'success')" v-if="message">{{ message }}</div>
     <new-meeting-form @added="addNewMeeting($event)"></new-meeting-form>
 
     <span v-if="meetings.length == 0">
@@ -26,15 +27,20 @@
         props: ['username'],
         data() {
             return {
-                meetings: []
+                meetings: [],
+                message: '',
+                isError: false
             };
         },
         methods: {
             addNewMeeting(meeting) {
+                
+                this.clearMessage();
                 this.$http.post('meetings', meeting)
-                    .then(() => {
-                        this.success('Spotkanie zostało dodane. Możesz się zapisać.');
+                    .then(response => {
+                        meeting.id = response.data;
                         this.meetings.push(meeting);
+                        this.success('Spotkanie zostało dodane. Możesz się zapisać.');
                     })
                     .catch(response => this.failure('Błąd przy dodawaniu spotkania. Kod odpowiedzi: ' + response.status));
             },
@@ -49,7 +55,52 @@
             
             deleteMeeting(meeting) {
                 this.meetings.splice(this.meetings.indexOf(meeting), 1);
+            },
+
+            success(message) {
+                this.message = message;
+                this.isError = false;
+            },
+            failure(message) {
+                this.message = message;
+                this.isError = true;
+            },
+            clearMessage() {
+                this.message = undefined;
             }
-        }
+        },
+
+ //       created() {
+   //         this.$http.get("meetings")
+     //       .then(response => {
+       //         this.meetings = JSON.parse(response.body);
+                //for (meeting in this.meetings) {
+                //    var query = "meetings/" + meeting.id + "/participants";
+                //    this.$http.get(query)
+                //    .then(response => {
+                //        meeting["participants"] = JSON.parse(response.body);
+                //    })
+                //    .catch(() => this.failure('Nie udało sie pobrac listy uczestnikow dla spotkania ' + meeting.title ));
+                //}
+  //           })
+    //        .catch(() => this.failure('Nie udało sie pobrać listy spotkań.' + response.status));
+      //  },
+
     }
 </script>
+<style lang="scss">
+ .alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 2px solid black;
+    &-success {
+      background: lightgreen;
+      border-color: darken(lightgreen, 10%);
+    }
+    &-error {
+      background: indianred;
+      border-color: darken(indianred, 10%);
+      color: white;
+    }
+ }
+</style>
