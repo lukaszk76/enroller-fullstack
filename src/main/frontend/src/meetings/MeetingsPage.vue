@@ -49,8 +49,8 @@
                 var query = "meetings/" + meeting.id + "/" + this.username;
                 this.$http.post(query)
                     .then( () => {
-                      this.success('Pomyślnie zapisałeś sie na spotkanie.');
                       meeting.participants.push(this.username);
+                      this.success('Pomyślnie zapisałeś sie na spotkanie.');
                     })
                     .catch(response => this.failure('Błąd przy zapisie uczestnika do spotkania. Kod odpowiedzi: ' + response.status));
             },
@@ -59,15 +59,20 @@
                 var query = "meetings/" + meeting.id + "/" + this.username;
                 this.$http.delete(query)
                     .then( () => {
-                      this.success('Pomyślnie wypisałeś sie ze spotkania.');
                       meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
+                      this.success('Pomyślnie wypisałeś sie ze spotkania.');
                     })
-                    .catch(response => this.failure('Błąd przy wypisywaniu uczestnika ze spotkania. Kod odpowiedzi: ' + response.status));
-                
+                    .catch(response => this.failure('Błąd przy wypisywaniu uczestnika ze spotkania. Kod odpowiedzi: ' + response.status));              
             },
             
             deleteMeeting(meeting) {
-                this.meetings.splice(this.meetings.indexOf(meeting), 1);
+                var query = "meetings/" + meeting.id;
+                this.$http.delete(query)
+                    .then( () => {
+                      this.meetings.splice(this.meetings.indexOf(meeting), 1);
+                      this.success('Pomyślnie usunąłeś spotkanie.');
+                    })
+                    .catch(response => this.failure('Błąd przy usuwaniu spotkania. Kod odpowiedzi: ' + response.status));
             },
 
             success(message) {
