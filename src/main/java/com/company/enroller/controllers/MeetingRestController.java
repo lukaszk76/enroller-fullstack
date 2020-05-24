@@ -65,14 +65,15 @@ public class MeetingRestController {
 	
 	@RequestMapping(value = "", method = RequestMethod.POST) 
 	public ResponseEntity<?> registerMeeting(@RequestBody Meeting meeting){
-		
 		Meeting foundMeeting = meetingService.findByID(meeting.getId());
 		if (foundMeeting != null) {
 			return new ResponseEntity("Unable to create. A meeting with ID " + meeting.getId() + " already exists.", HttpStatus.CONFLICT);
 		} else {
-			meetingService.registerMeeting(meeting);	
+			meetingService.registerMeeting(meeting);
+			
 		} 
-		return new ResponseEntity(HttpStatus.OK);
+		long id = meeting.getId();
+		return new ResponseEntity(id, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/{id}", method = RequestMethod.PUT) 
@@ -89,7 +90,6 @@ public class MeetingRestController {
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-
 	public ResponseEntity<?> deleteMeeting(@PathVariable("id") long id) {
 		
 		Meeting foundMeeting = meetingService.findByID(id);
@@ -102,7 +102,6 @@ public class MeetingRestController {
 	}
 	
 	@RequestMapping(value = "/{id}/{login}", method = RequestMethod.POST)
-
 	public ResponseEntity<?> addParticipantToMeeting(@PathVariable("id") long id, @PathVariable("login") String login) {
 		
 		ParticipantService participantService = new ParticipantService();
@@ -156,7 +155,7 @@ public class MeetingRestController {
 	
 	@RequestMapping(value = "/{id}/participants", method = RequestMethod.GET)
 	public ResponseEntity<?> getMeetingParticipants(@PathVariable("id") long meetingID) {
-	    
+	    System.out.println("called with id" + meetingID);
 		Collection<Participant> participants = meetingService.getMeetingParticipants(meetingID);
 		if (participants == null) { 
 		return new ResponseEntity(HttpStatus.NOT_FOUND);

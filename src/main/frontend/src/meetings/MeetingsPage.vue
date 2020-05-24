@@ -46,11 +46,24 @@
             },
 
             addMeetingParticipant(meeting) {
-                meeting.participants.push(this.username);
+                var query = "meetings/" + meeting.id + "/" + this.username;
+                this.$http.post(query)
+                    .then( () => {
+                      this.success('Pomyślnie zapisałeś sie na spotkanie.');
+                      meeting.participants.push(this.username);
+                    })
+                    .catch(response => this.failure('Błąd przy zapisie uczestnika do spotkania. Kod odpowiedzi: ' + response.status));
             },
 
             removeMeetingParticipant(meeting) {
-                meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
+                var query = "meetings/" + meeting.id + "/" + this.username;
+                this.$http.delete(query)
+                    .then( () => {
+                      this.success('Pomyślnie wypisałeś sie ze spotkania.');
+                      meeting.participants.splice(meeting.participants.indexOf(this.username), 1);
+                    })
+                    .catch(response => this.failure('Błąd przy wypisywaniu uczestnika ze spotkania. Kod odpowiedzi: ' + response.status));
+                
             },
             
             deleteMeeting(meeting) {
